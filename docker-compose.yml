@@ -15,7 +15,7 @@ services:
     env_file:
       - ./service.env
     volumes:
-      - $PWD/static:/app/static
+      - ./static:/app/static
     depends_on:
       - postgres
       - tarantool
@@ -34,7 +34,7 @@ services:
     env_file:
       - ./service.env
     volumes:
-      - $PWD/static:/app/static
+      - ./static:/app/static
     depends_on:
       - tarantool
       - consul
@@ -52,7 +52,7 @@ services:
     env_file:
       - ./service.env
     volumes:
-      - $PWD/static:/app/static
+      - ./static:/app/static
     depends_on:
       - postgres
       - consul
@@ -64,19 +64,19 @@ services:
         tag: "chat"
 
   consul:
-    image: consul
+    image: consul:1.12.0
     ports:
       - "8500:8500"
 
   vault:
-    image: vault
+    image: vault:1.9.6
     cap_add:
       - IPC_LOCK
     ports:
       - "8200:8200"
     volumes:
       - ./vault-data:/vault/data
-      - $PWD/configs/vault:/vault/config
+      - ./configs/vault:/vault/config
     command: vault server -config=/vault/config/vault.json
 
   postgres:
@@ -93,7 +93,7 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
-      - $PWD/configs/sql/:/docker-entrypoint-initdb.d/
+      - ./configs/sql/:/docker-entrypoint-initdb.d/
     restart: always
     logging:
       driver: gelf
@@ -111,7 +111,7 @@ services:
       - "3301:3301"
     volumes:
       - ./tarantool-data:/var/lib/tarantool
-      - $PWD/configs/lua/:/opt/tarantool/
+      - ./configs/lua/:/opt/tarantool/
     restart: always
     logging:
       driver: gelf
@@ -124,30 +124,30 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - $PWD/metrics:/etc/prometheus
+      - ./metrics:/etc/prometheus
 
-#  alertmanager:
-#    image: prom/alertmanager
-#    ports:
-#      - "9093:9093"
-#    command:
-#      - "--config.file=/etc/alertmanager/alertmanager.yml"
-#    volumes:
-#      - $PWD/metrics:/etc/alertmanager
-#
-#  alertmanager-bot:
-#    image: metalmatze/alertmanager-bot
-#    command:
-#      - "--listen.addr=0.0.0.0:8080"
-#    environment:
-#      ALERTMANAGER_URL: http://alertmanager:9093
-#      BOLT_PATH: /data/bot.db
-#      STORE: bolt
-#      TEMPLATE_PATHS: /templates/default.tmpl
-#      TELEGRAM_ADMIN: "138632615\n211453202\n389692057\n535095969"
-#      TELEGRAM_TOKEN: 1751242193:AAGNrFE61pvarspGfU4FBzhYF2ECUnf0eKo
-#    volumes:
-#      - $PWD/metrics/alertmanager-bot/templates:/templates
+  #  alertmanager:
+  #    image: prom/alertmanager
+  #    ports:
+  #      - "9093:9093"
+  #    command:
+  #      - "--config.file=/etc/alertmanager/alertmanager.yml"
+  #    volumes:
+  #      - $PWD/metrics:/etc/alertmanager
+  #
+  #  alertmanager-bot:
+  #    image: metalmatze/alertmanager-bot
+  #    command:
+  #      - "--listen.addr=0.0.0.0:8080"
+  #    environment:
+  #      ALERTMANAGER_URL: http://alertmanager:9093
+  #      BOLT_PATH: /data/bot.db
+  #      STORE: bolt
+  #      TEMPLATE_PATHS: /templates/default.tmpl
+  #      TELEGRAM_ADMIN: "138632615\n211453202\n389692057\n535095969"
+  #      TELEGRAM_TOKEN: 1751242193:AAGNrFE61pvarspGfU4FBzhYF2ECUnf0eKo
+  #    volumes:
+  #      - $PWD/metrics/alertmanager-bot/templates:/templates
 
   grafana:
     image: grafana/grafana
@@ -172,7 +172,6 @@ services:
     ports:
       - "6831:6831/udp"
       - "16686:16686"
-
 
   mongo:
     image: mongo:4.2
